@@ -388,7 +388,7 @@
           price: 10,
           image: "PondsTripleVitaminMoisturisingBo.png",
         },
-        9789389684421: {
+        8902519010124: {
           name: "Product 2",
           price: 14.99,
           image: "img2.jpg",
@@ -399,6 +399,7 @@
         "product-list-container"
       );
       const totalAmountElement = document.getElementById("total-amount");
+      const scanSound = document.getElementById("scan-sound");
 
       let cart = [];
 
@@ -428,6 +429,7 @@
 
           displayCart();
           updateTotal();
+          playScanSound(); // Play sound after successful addition
         }
       }
 
@@ -456,7 +458,7 @@
       }
       // DateTime functionality
       let currentDateTime = new Date();
-      const scanSound = document.getElementById("scan-sound");
+
       function updateDateTime() {
         const dateElement = document.getElementById("current-date");
         const options = {
