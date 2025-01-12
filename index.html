@@ -371,6 +371,10 @@
         <div id="reader"></div>
       </div>
 
+      <div class="product-list">
+        <ul id="product-list-container"></ul>
+      </div>
+
       <audio
         id="scan-sound"
         src="store-scanner-beep-90395.mp3"
@@ -378,6 +382,78 @@
       ></audio>
     </div>
     <script>
+      const products = {
+        8901030917035: {
+          name: "PONDs Silky Smooth Skin Cream",
+          price: 10,
+          image: "PondsTripleVitaminMoisturisingBo.png",
+        },
+        9789389684421: {
+          name: "Product 2",
+          price: 14.99,
+          image: "img2.jpg",
+        },
+      };
+
+      const productListContainer = document.getElementById(
+        "product-list-container"
+      );
+      const totalAmountElement = document.getElementById("total-amount");
+
+      let cart = [];
+
+      function updateTotal() {
+        let total = 0;
+        cart.forEach((item) => {
+          total += item.quantity * item.price;
+        });
+        totalAmountElement.textContent = `₹${total.toFixed(2)}`;
+      }
+
+      function addToCart(barcode) {
+        const product = products[barcode];
+        if (product) {
+          const existingItem = cart.find((item) => item.barcode === barcode);
+          if (existingItem) {
+            existingItem.quantity++;
+          } else {
+            cart.push({
+              barcode: barcode,
+              name: product.name,
+              price: product.price,
+              image: product.image,
+              quantity: 1,
+            });
+          }
+
+          displayCart();
+          updateTotal();
+        }
+      }
+
+      function removeFromCart(barcode) {
+        cart = cart.filter((item) => item.barcode !== barcode);
+        displayCart();
+        updateTotal();
+      }
+
+      function displayCart() {
+        productListContainer.innerHTML = "";
+        cart.forEach((item) => {
+          const listItem = document.createElement("li");
+          listItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" width="50">
+                    <span>${item.name}</span>
+                    <span>₹${item.price.toFixed(2)}</span>
+                    <button onclick="removeFromCart('${
+                      item.barcode
+                    }')">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="addToCart('${item.barcode}')">+</button>
+                `;
+          productListContainer.appendChild(listItem);
+        });
+      }
       // DateTime functionality
       let currentDateTime = new Date();
       const scanSound = document.getElementById("scan-sound");
@@ -477,4 +553,3 @@
     </script>
   </body>
 </html>
-
