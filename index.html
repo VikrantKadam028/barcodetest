@@ -746,15 +746,12 @@
     <script>
       // Product database
       const products = {
-        8901030917035: {
-          name: "PONDs Silky Smooth Skin Cream",
-          price: 10,
-          image: "PondsTripleVitaminMoisturisingBo.png",
-        },
+        
         8902519010124: {
-          name: "Product 2",
-          price: 14.99,
-          image: "img2.jpg",
+          name: "ClassMate Book A4 Size",
+          price: 75.0,
+          image:
+            "https://sbcstore.in/wp-content/uploads/2022/02/2001019_main_99860fa7-b573-44fd-9eb4-fd01b6458e96_1024x1024.jpg",
         },
       };
 
@@ -843,6 +840,10 @@
         }')">+</button>
       </div>
     `;
+          html5QrcodeScanner.pause(true);
+          setTimeout(() => {
+            html5QrcodeScanner.resume();
+          }, 1000);
           productListContainer.appendChild(listItem);
         });
       }
