@@ -351,11 +351,17 @@
         <div class="scanner">
             <div id="reader"></div>
         </div>
+
+        <audio
+        id="scan-sound"
+        src="store-scanner-beep-90395.mp3"
+        preload="auto"
+      ></audio>
     </div>
     <script>
         // DateTime functionality
         let currentDateTime = new Date();
-
+        const scanSound = document.getElementById("scan-sound");
         function updateDateTime() {
             const dateElement = document.getElementById("current-date");
             const options = {
@@ -395,6 +401,10 @@
             }
         });
 
+
+        function playScanSound() {
+        scanSound.play(); // Play the sound effect
+      }
         // Payment dropdown functionality
         const paymentButton = document.getElementById('paymentButton');
         const paymentOptions = document.getElementById('paymentOptions');
@@ -434,6 +444,7 @@
         );
 
         html5QrcodeScanner.render((decodedText, decodedResult) => {
+            playScanSound();
             console.log(`Code scanned = ${decodedText}`, decodedResult);
             // Add your logic for handling scanned codes here
         });
