@@ -561,6 +561,10 @@
         .quick-add,
         .total-container {
           margin-bottom: 10px;
+         
+        }
+        .quick-add{
+            background-color: saddlebrown;
         }
       }
     </style>
@@ -634,80 +638,94 @@
       </div>
     </div>
     <script>
-      const products = {
-        8901030917035: {
-          name: "PONDs Silky Smooth Skin Cream",
-          price: 10,
-          image: "PondsTripleVitaminMoisturisingBo.png",
-        },
-        8902519010124: {
-          name: "Product 2",
-          price: 14.99,
-          image: "img2.jpg",
-        },
-      };
+    // Product database
+const products = {
+  8901030917035: {
+    name: "PONDs Silky Smooth Skin Cream",
+    price: 10,
+    image: "PondsTripleVitaminMoisturisingBo.png",
+  },
+  8902519010124: {
+    name: "Product 2",
+    price: 14.99,
+    image: "img2.jpg",
+  },
+};
 
-      const productListContainer = document.getElementById(
-        "product-list-container"
-      );
-      const totalAmountElement = document.getElementById("total-amount");
-      const scanSound = document.getElementById("scan-sound");
+// Get DOM elements
+const productListContainer = document.getElementById("product-list-container");
+const createBillButton = document.querySelector(".create-bill span");
+const scanSound = document.getElementById("scan-sound");
 
-      let cart = [];
+let cart = [];
 
-      function updateTotal() {
-        let total = 0;
-        cart.forEach((item) => {
-          total += item.quantity * item.price;
-        });
-        totalAmountElement.textContent = `₹${total.toFixed(2)}`;
-      }
+function updateTotal() {
+  let total = 0;
+  cart.forEach((item) => {
+    total += item.quantity * item.price;
+  });
+  // Update both total displays
+  document.querySelector(".right-box p:nth-child(2)").textContent = `₹${total.toFixed(2)}`;
+  createBillButton.textContent = `Total (${total.toFixed(2)})`;
+}
 
-      function addToCart(barcode) {
-        const product = products[barcode];
-        if (product) {
-          const existingItem = cart.find((item) => item.barcode === barcode);
-          if (existingItem) {
-            existingItem.quantity++;
-          } else {
-            cart.push({
-              barcode: barcode,
-              name: product.name,
-              price: product.price,
-              image: product.image,
-              quantity: 1,
-            });
-          }
+function addToCart(barcode) {
+  const product = products[barcode];
+  if (product) {
+    const existingItem = cart.find((item) => item.barcode === barcode);
+    if (existingItem) {
+      existingItem.quantity++;
+    } else {
+      cart.push({
+        barcode: barcode,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1,
+      });
+    }
+    displayCart();
+    updateTotal();
+    playScanSound();
+  } else {
+    console.log("Product not found:", barcode);
+  }
+}
 
-          displayCart();
-          updateTotal();
-          playScanSound(); // Play sound after successful addition
-        }
-      }
+function removeFromCart(barcode) {
+  const itemIndex = cart.findIndex((item) => item.barcode === barcode);
+  if (itemIndex !== -1) {
+    if (cart[itemIndex].quantity > 1) {
+      cart[itemIndex].quantity--;
+    } else {
+      cart.splice(itemIndex, 1);
+    }
+    displayCart();
+    updateTotal();
+  }
+}
 
-      function removeFromCart(barcode) {
-        cart = cart.filter((item) => item.barcode !== barcode);
-        displayCart();
-        updateTotal();
-      }
+function displayCart() {
+  productListContainer.innerHTML = "";
+  cart.forEach((item) => {
+    const listItem = document.createElement("li");
+    listItem.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <span>${item.name}</span>
+      <span>₹${item.price.toFixed(2)}</span>
+      <button onclick="removeFromCart('${item.barcode}')">-</button>
+      <span>${item.quantity}</span>
+      <button onclick="addToCart('${item.barcode}')">+</button>
+    `;
+    productListContainer.appendChild(listItem);
+  });
+}
 
-      function displayCart() {
-        productListContainer.innerHTML = "";
-        cart.forEach((item) => {
-          const listItem = document.createElement("li");
-          listItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" width="50">
-                    <span>${item.name}</span>
-                    <span>₹${item.price.toFixed(2)}</span>
-                    <button onclick="removeFromCart('${
-                      item.barcode
-                    }')">-</button>
-                    <span>${item.quantity}</span>
-                    <button onclick="addToCart('${item.barcode}')">+</button>
-                `;
-          productListContainer.appendChild(listItem);
-        });
-      }
+function playScanSound() {
+  scanSound.currentTime = 0;
+  scanSound.play().catch(error => console.log("Sound play failed:", error));
+}
+
       // DateTime functionality
       let currentDateTime = new Date();
 
@@ -791,11 +809,18 @@
         showTorchButtonIfSupported: true,
       });
 
-      html5QrcodeScanner.render((decodedText, decodedResult) => {
-        playScanSound();
-        console.log(`Code scanned = ${decodedText}`, decodedResult);
-        // Add your logic for handling scanned codes here
-      });
+      html5QrcodeScanner.render((decodedText) => {
+  // Handle the scanned barcode
+  addToCart(decodedText);
+  // Optional: Pause scanning briefly after successful scan
+  html5QrcodeScanner.pause(true);
+  setTimeout(() => {
+    html5QrcodeScanner.resume();
+  }, 1000);
+});
+
+// Initialize display
+updateTotal();
 
       // Handle window resize for scanner
       window.addEventListener("resize", () => {
